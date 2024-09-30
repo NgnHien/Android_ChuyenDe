@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.example.socialmediatdcproject.R;
 import com.example.socialmediatdcproject.fragment.BusinessFragment;
 import com.example.socialmediatdcproject.fragment.DepartmentFragment;
+import com.example.socialmediatdcproject.fragment.GroupFragment;
 import com.example.socialmediatdcproject.fragment.HomeFragment;
 import com.example.socialmediatdcproject.fragment.PostFragment;
 import com.example.socialmediatdcproject.fragment.YouthFragment;
@@ -93,7 +94,6 @@ public class SharedActivity extends AppCompatActivity {
         ViewGroup.LayoutParams params = firstContentFragment.getLayoutParams();
         params.height = height; // Đặt chiều cao mới
         firstContentFragment.setLayoutParams(params); // Cập nhật LayoutParams
-        Log.d("Height", "changeFrameLayoutHeight: " + params.height);
     }
 
     private void addNavigationItems(NavigationView navigationView) {
@@ -144,6 +144,11 @@ public class SharedActivity extends AppCompatActivity {
                         // Đoàn thanh niên
                         fragment = new YouthFragment();
                         changeFrameLayoutHeight(800);
+                        break;
+                    case 5:
+                        // Group
+                        fragment = new GroupFragment();
+                        changeFrameLayoutHeight(400);
                         break;
                     default:
                         fragment = new HomeFragment();
