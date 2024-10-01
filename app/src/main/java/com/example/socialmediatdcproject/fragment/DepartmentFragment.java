@@ -1,6 +1,7 @@
 package com.example.socialmediatdcproject.fragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,10 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.socialmediatdcproject.R;
+import com.example.socialmediatdcproject.adapter.PostAdapter;
+import com.example.socialmediatdcproject.database.PostDatabase;
+import com.example.socialmediatdcproject.model.Post;
+
+import java.util.ArrayList;
 
 public class DepartmentFragment extends Fragment {
 
@@ -28,79 +34,65 @@ public class DepartmentFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Tìm các nút
-        Button infoButton = view.findViewById(R.id.button_department_info);
-        Button postButton = view.findViewById(R.id.button_department_post);
-        Button memberButton = view.findViewById(R.id.button_department_member);
+        // Khởi tạo danh sách bài đăng
+        ArrayList<Post> postsDepartment = new ArrayList<>();
 
-        // Set màu mặc định cho nút "Bài viết"
-        postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-        postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
+        // Lấy RecyclerView từ layout của Activity (shared_layout)
+        RecyclerView recyclerView = requireActivity().findViewById(R.id.second_content_fragment);
 
-        infoButton.setOnClickListener(v -> {
-            // Tạo instance của MemberFragment
-            Fragment memberFragment = new MemberFragment();
+        // Mặc định vào bài viết trước
+        PostDatabase postDatabase = new PostDatabase();
+        for (Post p : postDatabase.dataPost()) {
+            if (p.getUserId() == 10) {  // Điều kiện lấy bài đăng theo userId
+                postsDepartment.add(p);
+            }
+        }
 
-            // Lấy FragmentManager từ Activity
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
+        // Kiểm tra RecyclerView không null
+        if (recyclerView != null) {
+            // Thiết lập LayoutManager cho RecyclerView
+            recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 
-            // Thay thế second_content_fragment bằng MemberFragment
-            transaction.replace(R.id.second_content_fragment, memberFragment);
-            transaction.addToBackStack(null); // Nếu bạn muốn người dùng có thể quay lại Fragment trước đó
-            transaction.commit();
+            // Thiết lập Adapter cho RecyclerView (khởi tạo Adapter với danh sách postsDepartment)
+            PostAdapter postAdapter = new PostAdapter(postsDepartment);
+            recyclerView.setAdapter(postAdapter);
 
-            // Cập nhật màu cho các nút
-            memberButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            memberButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            infoButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            infoButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
-        });
-        postButton.setOnClickListener(v -> {
-            // Tạo instance của MemberFragment
-            Fragment memberFragment = new PostFragment();
+            // Tìm các nút
+            Button infoButton = view.findViewById(R.id.button_department_info);
+            Button postButton = view.findViewById(R.id.button_department_post);
+            Button memberButton = view.findViewById(R.id.button_department_member);
 
-            // Lấy FragmentManager từ Activity
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-            // Thay thế second_content_fragment bằng MemberFragment
-            transaction.replace(R.id.second_content_fragment, memberFragment);
-            transaction.addToBackStack(null); // Nếu bạn muốn người dùng có thể quay lại Fragment trước đó
-            transaction.commit();
-
-            // Cập nhật màu cho các nút
-            infoButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            infoButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            memberButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            memberButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+            // Set màu mặc định cho nút "Bài viết"
             postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
             postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
-        });
 
-        // Sự kiện khi nhấn vào nút memberButton
-        memberButton.setOnClickListener(v -> {
-            // Tạo instance của MemberFragment
-            Fragment memberFragment = new MemberFragment();
+            // Sự kiện khi nhấn vào nút postButton
+            postButton.setOnClickListener(v -> {
+                // Thông báo cho Adapter rằng dữ liệu đã thay đổi để cập nhật lại giao diện
+                postAdapter.notifyDataSetChanged();
 
-            // Lấy FragmentManager từ Activity
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
+                // Cập nhật màu cho các nút
+                infoButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+                infoButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                memberButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+                memberButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
+            });
 
-            // Thay thế second_content_fragment bằng MemberFragment
-            transaction.replace(R.id.second_content_fragment, memberFragment);
-            transaction.addToBackStack(null);
-            transaction.commit();
-
-            // Cập nhật màu cho các nút
-            infoButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            infoButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
-            postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            memberButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
-            memberButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
-        });
+            // Sự kiện khi nhấn vào nút memberButton
+            memberButton.setOnClickListener(v -> {
+                // Cập nhật màu cho các nút
+                infoButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+                infoButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                postButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.white));
+                postButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                memberButton.setBackgroundTintList(ContextCompat.getColorStateList(requireContext(), R.color.defaultBlue));
+                memberButton.setTextColor(ContextCompat.getColorStateList(requireContext(), R.color.white));
+            });
+        } else {
+            // Log lỗi nếu không tìm thấy RecyclerView
+            Log.e("DepartmentFragment", "RecyclerView not found");
+        }
     }
 }

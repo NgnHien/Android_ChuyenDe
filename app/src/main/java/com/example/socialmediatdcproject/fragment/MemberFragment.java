@@ -15,14 +15,6 @@ public class MemberFragment extends Fragment {
 
     private static final String ARG_POST_TEXT = "post_text";
 
-    public static PostFragment newInstance(String postText) {
-        PostFragment fragment = new PostFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_POST_TEXT, postText);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

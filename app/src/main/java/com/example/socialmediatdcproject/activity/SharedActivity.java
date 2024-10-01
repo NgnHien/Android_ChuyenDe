@@ -1,8 +1,6 @@
 package com.example.socialmediatdcproject.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,16 +17,22 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.socialmediatdcproject.R;
+import com.example.socialmediatdcproject.adapter.PostAdapter;
+import com.example.socialmediatdcproject.database.PostDatabase;
 import com.example.socialmediatdcproject.fragment.BusinessFragment;
 import com.example.socialmediatdcproject.fragment.DepartmentFragment;
 import com.example.socialmediatdcproject.fragment.GroupFragment;
 import com.example.socialmediatdcproject.fragment.HomeFragment;
-import com.example.socialmediatdcproject.fragment.PostFragment;
 import com.example.socialmediatdcproject.fragment.YouthFragment;
+import com.example.socialmediatdcproject.model.Post;
 import com.google.android.material.navigation.NavigationView;
+
+import java.util.ArrayList;
 
 public class SharedActivity extends AppCompatActivity {
     protected DrawerLayout drawerLayout;
@@ -73,22 +77,26 @@ public class SharedActivity extends AppCompatActivity {
             fragmentTransaction.replace(R.id.first_content_fragment, new HomeFragment());
 
             // Giả dữ liệu các post
-            String[] fakePosts = {"Post 1: Hello World!", "Post 2: Welcome to the app!", "Post 3: This is a fake post!"};
+            PostDatabase postDatabase = new PostDatabase();
+            ArrayList<Post> posts = postDatabase.dataPost();
 
-            // Nạp từng PostFragment vào fragment_content_second
-            for (String post : fakePosts) {
-                PostFragment postFragment = PostFragment.newInstance(post);
-                fragmentTransaction.add(R.id.second_content_fragment, postFragment);
-            }
+            // Setup RecyclerView với Adapter
+            RecyclerView recyclerView = findViewById(R.id.second_content_fragment);
+            PostAdapter postAdapter = new PostAdapter(posts);
+            recyclerView.setAdapter(postAdapter);
+
+            // Sử dụng LayoutManager cho RecyclerView
+            recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
             fragmentTransaction.commit();
         }
 
+
         // Thiết lập sự kiện click cho icon_back
         ImageButton backButton = navigationView.getHeaderView(0).findViewById(R.id.icon_back);
         backButton.setOnClickListener(v -> drawerLayout.closeDrawer(GravityCompat.START));
-
     }
+
 
     private void changeFrameLayoutHeight(int height) {
         ViewGroup.LayoutParams params = firstContentFragment.getLayoutParams();
